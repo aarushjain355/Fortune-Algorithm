@@ -17,13 +17,13 @@ struct Edge {
     Point point2;
 };
 
-struct Parabola {
+// struct Parabola {
 
-    std::vector<Point> Parabola_points;
-};
+//     std::vector<Point> Parabola_points;
+// };
 
 struct Node {
-    Parabola parabola;
+    int i;
     Node* left;
     Node* right;
 };
@@ -90,59 +90,44 @@ class FortunesAlgo {
             bottom.point2 = bottom_left;
             left.point1 = bottom_left;
             left.point2 = top_left;
-
-            for(size_t i = top.point1.y; i >= 0; i-=0.1) {
-                auto target = std::find_if(sites.begin(), sites.end(), [i](const Point& d) {
-                    return d.y == i;
-                });
-
-                if (target != sites.end()) {
-                    Parabola new_parabole;
-                    double site_x = sites[target - sites.begin()].x;
-                    double site_y = sites[target - sites.begin()].y;
-                    std::thread greater_than_thread(parabola_generator, site_x, site_y, i, top_left.y, true);
-                    std::thread less_than_thread(parabola_generator, site_x, site_y, i, top_left.y, false);
-                    greater_than_thread.join();
-                    less_than_thread.join();
-                    //parabola_generator(site_x, site_y, i, top_left.y, true);
-                }
-                
+            if (head != nullptr) {
+                cout << "hello";
             }
-            // for (size_t i = 0; i < max_y; i++) {
+            // for(size_t i = top.point1.y; i >= 0; i-=0.1) {
+            //     auto target = std::find_if(sites.begin(), sites.end(), [i](const Point& d) {
+            //         return d.y == i;
+            //     });
 
-            // }
-            //for (size_t i = 0; i < sites.size(); i++) {
+            //     if (target != sites.end()) {
+            //         double site_x = sites[target - sites.begin()].x;
+            //         double site_y = sites[target - sites.begin()].y;
+            //         Node* new_parabola;
+            //         if (head == nullptr) {
+            //             cout << "hELLO";
+            //         }
 
-                // three main rules of fortune's
-                // each point has standard quadratic formula
-                // when two parabols intersect the points becomes edges
-                // when three parabolas intersect it becomes a vertex
-
-                // Pseudocode
-
-                // Find max and min for both y and x coordinates and make 4 edges
-                // Start beach line at bottom meaning y = 0
-                // increment by 0.1
-                // every time a site is encountered, create a parabola using pre-determined function
-                // potentially use dynamic programming or recursion for above step
-                // any time two parabolas intersect, create new edge and monitor the intersection
-                // any time three parabolas intersect at either end, set those points as the start and ed for that edge
-
+            //         //std::thread greater_than_thread(parabola_generator, site_x, site_y, i, top_left.y, true);
+            //         //std::thread less_than_thread(parabola_generator, site_x, site_y, i, top_left.y, false);
+            //         //greater_than_thread.join();
+            //         //less_than_thread.join();
+            //         //parabola_generator(site_x, site_y, i, top_left.y, true);
+            //     }
                 
-
-
-
-            //}
-
+            // }
+            
 
         }
 
         static void parabola_generator(double x_site, double y_site, double y_line, double y_boundary, bool greater_than) {
 
+            double a = 1;
+            double b = 2*x_site/(2*y_site - 2*y_line);
+            double c = (x_site*x_site + y_site*y_site - y_line*y_line)/(2*y_site - 2*y_line) - y_boundary;
+
             if (greater_than) {
-                double a = 1;
-                double b = 2*x_site/(2*y_site - 2*y_line);
-                //double c = 
+                double x_max = std::max(((-1*b + sqrt(b*b - 4*a*c))/2*a), (-1*b - sqrt(b*b - 4*a*c))/2*a);
+            } else {
+                double x_min = std::min(((-1*b + sqrt(b*b - 4*a*c))/2*a), (-1*b - sqrt(b*b - 4*a*c))/2*a);
             }
         }
 
@@ -161,5 +146,6 @@ int main(int argc, char *argv[]) {
     FortunesAlgo object;
     object.generate_random_points();
     object.fortunes_algorithm();
+    //cout << "Hello";
     return 0;
 }
