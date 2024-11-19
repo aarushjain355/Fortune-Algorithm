@@ -12,7 +12,16 @@ struct Point {
     int y;
 };
 
+struct Node {
+    double site_x;
+    double site_y;
+    bool null;
+    Node* next;
+};
+
 struct Edge {
+    Node* node1;
+    Node* node2;
     Point point1;
     Point point2;
 };
@@ -22,11 +31,7 @@ struct Edge {
 //     std::vector<Point> Parabola_points;
 // };
 
-struct Node {
-    int i;
-    Node* left;
-    Node* right;
-};
+
 
 class FortunesAlgo {
 
@@ -90,52 +95,155 @@ class FortunesAlgo {
             bottom.point2 = bottom_left;
             left.point1 = bottom_left;
             left.point2 = top_left;
-            if (head != nullptr) {
-                cout << "hello";
-            }
-            // for(size_t i = top.point1.y; i >= 0; i-=0.1) {
-            //     auto target = std::find_if(sites.begin(), sites.end(), [i](const Point& d) {
-            //         return d.y == i;
-            //     });
+            head->null = true;
+            
+            for(size_t i = top.point1.y; i >= 0; i-=0.1) {
+                auto target = std::find_if(sites.begin(), sites.end(), [i](const Point& d) {
+                    return d.y == i;
+                });
 
-            //     if (target != sites.end()) {
-            //         double site_x = sites[target - sites.begin()].x;
-            //         double site_y = sites[target - sites.begin()].y;
-            //         Node* new_parabola;
+                if (target != sites.end()) {
+                    double site_x = sites[target - sites.begin()].x;
+                    double site_y = sites[target - sites.begin()].y;
+                    Node* new_parabola;
+                    new_parabola->site_x = site_x;
+                    new_parabola->site_y = site_y;
+                    new_parabola->next = nullptr;
+                    
+                    if (head->null) {
+                        head->null = false;
+                        head->site_x = site_x;
+                        head->site_y = site_y;
+                        head->next = nullptr;
+                        
+                    } else {
+                        Node* current = head;
+                        Node* prev;
+                        while (current != nullptr) {
+                            if (current->site_x > site_x) {
+                                if (current == head) {
+                                    new_parabola->next = head;
+                                    head = new_parabola;
+                                } else {
+                                    prev->next = new_parabola;
+                                    new_parabola->next = current;
+                                }
+                                break;
+                            }
+                            prev = current;
+                            current = current->next;
+                            
+                        }
+                    }
             //         if (head == nullptr) {
             //             cout << "hELLO";
-            //         }
+                }
+
+                
+                
 
             //         //std::thread greater_than_thread(parabola_generator, site_x, site_y, i, top_left.y, true);
             //         //std::thread less_than_thread(parabola_generator, site_x, site_y, i, top_left.y, false);
             //         //greater_than_thread.join();
             //         //less_than_thread.join();
             //         //parabola_generator(site_x, site_y, i, top_left.y, true);
-            //     }
+            }
                 
             // }
             
 
         }
 
-        static void parabola_generator(double x_site, double y_site, double y_line, double y_boundary, bool greater_than) {
+        void parabola_intersection(double y_line, double y_boundary) {
 
-            double a = 1;
-            double b = 2*x_site/(2*y_site - 2*y_line);
-            double c = (x_site*x_site + y_site*y_site - y_line*y_line)/(2*y_site - 2*y_line) - y_boundary;
+            Node* current = head;
+            Node* prev = head;
+            double x_site1, y_site1, x_site2, y_site2, x_site3, y_site3;
+            double constant, numerator, denominator, x_POI, y_POI, y_third_poi;
+            bool deleted;
+            while (current != nullptr) {
+                deleted = false;
+                if (current != head) {
+                    x_site1 = prev->site_x;
+                    y_site1 = prev->site_y;
+                    x_site2 = current->site_x;
+                    y_site2 = current->site_y;
+                    x_site3 = current->next->site_x;
+                    y_site3 = current->next->site_y;
+                    constant = (2*y_site1 - 2*y_line)/(2*y_site2 - 2*y_line);
+                    numerator = x_site1*x_site1 + y_site1*y_site1 - y_line*y_line + (-1*x_site2*x_site2 - y_site2*y_site2 + y_line*y_line)*constant;
+                    denominator = 2*x_site1 - 2*x_site2*constant;
+                    x_POI = numerator/denominator;
+                    y_POI = (x_POI*x_POI - 2*x_POI*x_site1 + x_site1*x_site1 + y_site1*y_site1 - y_line*y_line)/(2*y_site1 - 2*y_line);
+                    y_third_poi = (x_POI*x_POI - 2*x_POI*x_site3 + x_site3*x_site3 + y_site3*y_site3 - y_line*y_line)/(2*y_site3 - 2*y_line);
+                    
+                    if (y_POI <= y_boundary) {
 
-            if (greater_than) {
-                double x_max = std::max(((-1*b + sqrt(b*b - 4*a*c))/2*a), (-1*b - sqrt(b*b - 4*a*c))/2*a);
-            } else {
-                double x_min = std::min(((-1*b + sqrt(b*b - 4*a*c))/2*a), (-1*b - sqrt(b*b - 4*a*c))/2*a);
+                        if (y_POI == y_third_poi) {
+                            for (size_t i = 0; i < edges.size(); i++) {
+                                if (edges[i].node1 == prev && edges[i].node2 == current) {
+
+                                    // Pseudocode: keep track of edges for the every time 
+                                    // Note 1: the second point of one edge is the first point of anothe edge
+                                    // Note 2: if y_intersection is equal to y  boundary then that is first point
+                                    Point new_vertex;
+                                    new_vertex.x = x_POI;
+                                    new_vertex.y = y_POI;
+                                    
+                                    
+                                  
+                                }
+                            }
+                            current = current->next;
+                            prev->next = current->next;
+                            deleted = true;
+
+                        } else {
+                            Edge new_edge;
+                            new_edge.node1 = prev;
+                            new_edge.node2 = current;
+                            edges.push_back(new_edge);
+                            if (y_POI == y_boundary) {
+                                Point new_vertex;
+                                new_vertex.x = x_POI;
+                                new_vertex.y = y_POI;
+                                new_edge.point1 = new_vertex;
+                            }
+                        }
+                    }
+
+                } else if (current->next == nullptr) {
+
+                }
+                if (deleted == false) {
+                    prev = current;
+                    current = current->next;
+                }
+                      
             }
-        }
+        } 
+
+        
+
+        // static void parabola_generator(double x_site, double y_site, double y_line, double y_boundary, bool greater_than) {
+
+        //     double a = 1;
+        //     double b = 2*x_site/(2*y_site - 2*y_line);
+        //     double c = (x_site*x_site + y_site*y_site - y_line*y_line)/(2*y_site - 2*y_line) - y_boundary;
+
+        //     if (greater_than) {
+        //         double x_max = std::max(((-1*b + sqrt(b*b - 4*a*c))/2*a), (-1*b - sqrt(b*b - 4*a*c))/2*a);
+        //     } else {
+        //         double x_min = std::min(((-1*b + sqrt(b*b - 4*a*c))/2*a), (-1*b - sqrt(b*b - 4*a*c))/2*a);
+        //     }
+        // }
 
 
 
     private:
         std::vector<Point> sites;
         std::vector<Edge> edges;
+        std::vector<Point> verticies;
         Node* head;
 
 };
