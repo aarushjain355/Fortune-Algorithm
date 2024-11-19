@@ -186,6 +186,7 @@ class FortunesAlgo {
                                     // Pseudocode: keep track of edges for the every time 
                                     // Note 1: the second point of one edge is the first point of anothe edge
                                     // Note 2: if y_intersection is equal to y  boundary then that is first point
+                                    // Test commit
                                     Point new_vertex;
                                     new_vertex.x = x_POI;
                                     new_vertex.y = y_POI;
