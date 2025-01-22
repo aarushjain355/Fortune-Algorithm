@@ -154,7 +154,7 @@ class FortunesAlgo {
 
         }
 
-        void parabola_intersection(double y_line, double y_boundary) {
+        void parabola_intersection(double y_line, double y_boundary, double y_boundary2) {
 
             Node* current = head;
             Node* prev = head;
@@ -185,11 +185,13 @@ class FortunesAlgo {
 
                                     // Pseudocode: keep track of edges for the every time 
                                     // Note 1: the second point of one edge is the first point of anothe edge
-                                    // Note 2: if y_intersection is equal to y  boundary then that is first point
+                                    // Note 2: Still need to delete node that overlapped
+                                    // Note 3: At end, only update point2 if poi is same as lower boundary
                                     // Test commit
                                     Point new_vertex;
                                     new_vertex.x = x_POI;
                                     new_vertex.y = y_POI;
+                                    
                                     
                                     
                                   
@@ -200,15 +202,25 @@ class FortunesAlgo {
                             deleted = true;
 
                         } else {
-                            Edge new_edge;
-                            new_edge.node1 = prev;
-                            new_edge.node2 = current;
-                            edges.push_back(new_edge);
+                         
                             if (y_POI == y_boundary) {
+                                Edge new_edge;
+                                new_edge.node1 = prev;
+                                new_edge.node2 = current;
+                                edges.push_back(new_edge);
                                 Point new_vertex;
                                 new_vertex.x = x_POI;
                                 new_vertex.y = y_POI;
                                 new_edge.point1 = new_vertex;
+                            } else if (y_POI == y_boundary2) {
+                                Point new_vertex;
+                                new_vertex.x = x_POI;
+                                new_vertex.y = y_POI;
+                                for (int i = 0; i < edges.size(); i++) {
+                                    if (edges[i].node2 == current) {
+                                        edges[i].point2 = new_vertex;
+                                    }
+                                }
                             }
                         }
                     }
