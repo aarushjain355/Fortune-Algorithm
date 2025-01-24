@@ -32,7 +32,7 @@ struct Edge {
 // };
 
 
-
+// Class to execute fortune's algorithm
 class FortunesAlgo {
 
     public:
