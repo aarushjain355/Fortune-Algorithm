@@ -7,6 +7,8 @@
 
 using namespace std;
 
+// Structures for Algorithm
+
 struct Point {
     int x;
     int y;
@@ -26,10 +28,6 @@ struct Edge {
     Point point2;
 };
 
-// struct Parabola {
-
-//     std::vector<Point> Parabola_points;
-// };
 
 
 // Class to execute fortune's algorithm
