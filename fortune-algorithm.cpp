@@ -7,7 +7,7 @@
 
 using namespace std;
 
-// Structures for Algorithm
+// Structures for Algorithm1
 
 struct Point {
     int x;
